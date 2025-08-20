@@ -5,7 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # 导入路由
 from src.router.hotspot.router import router as hotspot_router
-# from src.router.filekb.router import router as filekb_router  # 知识库router（待实现）
+# from src.router.filekb.router import router as filekb_router  # 知识库路由（待实现）
+
+# 导入Redis客户端
+from src.dbs.redis_stack.init import redis_client
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,12 +18,26 @@ async def lifespan(app: FastAPI):
 
     # 可以在这里初始化数据库连接、缓存等
     # await init dbs
-    # await mongo_client.init_client()
+    try:
+        # 异步ping测试Redis连接
+        await redis_client.get_client().ping()
+        print("✅ Redis连接测试成功")
+    except Exception as e:
+        print(f"❌ Redis连接测试失败: {e}")
+        # 可以选择是否在连接失败时退出应用
+        # raise e
+
+    # await mongo_client.init_client()  # MongoDB暂时不用管
 
     yield
 
     # 关闭时的清理工作
     print("🛑 应用关闭中...")
+    try:
+        await redis_client.get_client().close()
+        print("✅ Redis连接已关闭")
+    except Exception as e:
+        print(f"⚠️ Redis连接关闭时出现问题: {e}")
 
 
 app = FastAPI(
@@ -40,8 +57,8 @@ app.add_middleware(
 )
 
 # 注册路由
-app.include_router(hotspot_router, tags=['销售平台接口']) #热点问题router
-# app.include_router(filekb_router, tags=['培训平台接口'])  # 知识库router（待实现）
+app.include_router(hotspot_router, tags=['销售平台接口'])
+# app.include_router(filekb_router, tags=['培训平台接口'])  # 知识库路由（待实现）
 
 # 根路径接口
 @app.get("/", summary="服务根路径")
