@@ -39,7 +39,7 @@ async def add_questions_batch(request: AddQuestionBatchRequest):
     return await hotspot_handler.add_questions_batch(request)
 
 
-@router.put("/questions/{question_id}", response_model=ApiResponse, summary="更新热点问题")
+@router.post("/questions/{question_id}/update", response_model=ApiResponse, summary="更新热点问题")
 async def update_question(
     question_id: str = Path(..., description="要更新的问题ID"),
     question: Optional[str] = Body(None, description="更新的问题内容"),
@@ -119,10 +119,10 @@ async def list_questions(
     return await hotspot_handler.list_questions(group_id, limit)
 
 
-@router.delete("/questions/{question_id}", response_model=ApiResponse, summary="删除热点问题")
+@router.post("/questions/{question_id}/delete", response_model=ApiResponse, summary="删除热点问题")
 async def delete_question(
     question_id: str = Path(..., description="要删除的问题ID"),
-    group_id: str = Query(..., description="分组ID")
+    group_id: str = Body(..., description="分组ID")
 ):
     """
     删除指定的热点问题
