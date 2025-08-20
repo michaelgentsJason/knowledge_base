@@ -1,5 +1,5 @@
 """
-热点问题接口的数据结构
+热点问题接口的数据结构 - 添加批量处理支持
 """
 from pydantic import BaseModel, Field
 from typing import List, Optional, Any
@@ -16,12 +16,13 @@ class QuestionInfo(BaseModel):
 
 class AddQuestionRequest(BaseModel):
     """添加热点问题的数据结构"""
-    question_info:QuestionInfo
+    question_info: QuestionInfo
     group_id: str = Field(..., description='该问题属于的分组，一个公司默认只有一个分组')
 
 
 class AddQuestionBatchRequest(BaseModel):
-    question_info_list : list[QuestionInfo]
+    """批量添加热点问题的数据结构"""
+    question_info_list: list[QuestionInfo]
     group_id: str = Field(..., description='该问题属于的分组，一个公司默认只有一个分组')
 
 
@@ -40,6 +41,29 @@ class QueryRequest(BaseModel):
     limit: Optional[int] = 3
     group_id: str = Field(..., description='该问题属于的分组，一个公司默认只有一个分组')
 
+
+class BatchQueryRequest(BaseModel):
+    """批量查询热点问题"""
+    queries: List[str] = Field(..., description="查询文本列表")
+    limit: Optional[int] = Field(3, description="每个查询返回的结果数量限制")
+    group_id: str = Field(..., description="该问题属于的分组，一个公司默认只有一个分组")
+
+
+class QueryResult(BaseModel):
+    """单个查询结果"""
+    query: str = Field(..., description="查询文本")
+    query_index: int = Field(..., description="查询在批量请求中的索引")
+    results: List[dict] = Field(..., description="搜索结果列表")
+    total: int = Field(..., description="结果总数")
+    original_count: Optional[int] = Field(None, description="过滤前的原始结果数量")
+    error: Optional[str] = Field(None, description="查询错误信息")
+
+
+class BatchQueryResponse(BaseModel):
+    """批量查询响应"""
+    queries: List[QueryResult] = Field(..., description="所有查询的结果")
+    total_queries: int = Field(..., description="总查询数量")
+    search_params: dict = Field(..., description="搜索参数")
 
 
 class ApiResponse(BaseModel):

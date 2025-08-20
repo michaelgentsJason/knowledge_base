@@ -15,7 +15,7 @@ class RedisClient:
             host=self.cfg.get('host'),
             port=self.cfg.get('port'),
             db=self.cfg.get('db'),
-            password=self.cfg.get('password'),
+            # password=self.cfg.get('password'),
             decode_responses=True
         )
         self.ping() # 如果ping出错，则证明初始化失败

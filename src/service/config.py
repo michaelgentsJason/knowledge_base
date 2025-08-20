@@ -25,7 +25,7 @@ class MyConfig:
         return {
             "embedding": {
                 "model": "BAAI/bge-m3",
-                "base_url": "http://10.33.0.167:8100/v1", #TODO: 后续换成线上的
+                "base_url": "http://10.33.0.167:8100/v1",
                 "api_key": "empty",
                 "n_dim":1024
             },
